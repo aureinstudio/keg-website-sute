@@ -2,12 +2,22 @@ import { createServerSupabaseClient } from '@/lib/supabase/client'
 import { TemplateCard } from '@/components/admin/TemplateCard'
 import Link from 'next/link'
 
+interface TemplateListItem {
+  id: string
+  name: string
+  thumbnail_url: string | null
+  keywords: string[]
+  created_at: string
+}
+
 export default async function TemplatesPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: templates } = await supabase
+  const { data } = await supabase
     .from('templates')
     .select('id, name, thumbnail_url, keywords, created_at')
     .order('created_at', { ascending: false })
+
+  const templates = (data ?? []) as TemplateListItem[]
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
@@ -26,7 +36,7 @@ export default async function TemplatesPage() {
         </Link>
       </div>
 
-      {templates?.length ? (
+      {templates.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((t) => (
             <TemplateCard
