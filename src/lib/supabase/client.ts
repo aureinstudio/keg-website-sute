@@ -1,6 +1,12 @@
-import { createBrowserClient, createServerClient } from '@supabase/ssr'
+import { createBrowserClient, createServerClient, type CookieOptions } from '@supabase/ssr'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+
+interface CookieToSet {
+  name: string
+  value: string
+  options: CookieOptions
+}
 
 // Database 제너릭은 의도적으로 생략한다.
 // Next.js 16 Turbopack + @supabase/ssr 조합에서 partial select가
@@ -22,7 +28,7 @@ export async function createServerSupabaseClient() {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
+        setAll: (cookiesToSet: CookieToSet[]) => {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           )
