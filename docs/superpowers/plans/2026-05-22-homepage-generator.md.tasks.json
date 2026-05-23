@@ -1,0 +1,82 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-22-homepage-generator.md",
+  "tasks": [
+    {
+      "id": 0,
+      "subject": "Task 0: Supabase 스키마 + 환경 설정",
+      "status": "pending",
+      "description": "**Goal:** DB 테이블, pgvector 익스텐션, Storage 버킷 생성 및 환경변수 구성\n\n**Files:**\n- Create: `supabase/migrations/001_init.sql`\n- Create: `.env.local.example`\n- Create: `src/lib/supabase/client.ts`\n- Create: `src/lib/supabase/types.ts`\n\n**Acceptance Criteria:**\n- [ ] pgvector 익스텐션 활성화\n- [ ] templates, projects, pages 테이블 생성\n- [ ] screenshots 버킷 존재\n- [ ] supabase client가 server/client 양쪽에서 import 가능\n\n**Verify:** `npx supabase db reset` → 에러 없이 완료\n\n```json:metadata\n{\"files\": [\"supabase/migrations/001_init.sql\", \"src/lib/supabase/client.ts\", \"src/lib/supabase/types.ts\", \".env.local.example\"], \"verifyCommand\": \"npx supabase db reset\", \"acceptanceCriteria\": [\"pgvector enabled\", \"tables created\", \"screenshots bucket exists\", \"client importable\"]}\n```"
+    },
+    {
+      "id": 1,
+      "subject": "Task 1: 프로젝트 초기화 + 공통 라이브러리",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** Next.js 프로젝트 생성 및 Claude/OpenAI 클라이언트 구성\n\n**Files:**\n- Create: `src/lib/claude.ts`\n- Create: `src/lib/openai.ts`\n- Create: `src/lib/types.ts`\n\n**Verify:** `npx tsc --noEmit` → 에러 없음\n\n```json:metadata\n{\"files\": [\"src/lib/claude.ts\", \"src/lib/openai.ts\", \"src/lib/types.ts\"], \"verifyCommand\": \"npx tsc --noEmit\", \"acceptanceCriteria\": [\"next dev runs\", \"claude client importable\", \"openai embedding returns number[]\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: Style Engine — Crawler",
+      "status": "pending",
+      "blockedBy": [1],
+      "description": "**Goal:** URL을 받아 HTML/CSS 추출 및 스크린샷 Supabase Storage 저장\n\n**Files:**\n- Create: `src/lib/style-engine/crawler.ts`\n\n**Verify:** `curl -X POST /api/templates/analyze -d '{\"url\":\"https://example.com\"}'` → screenshotUrl 반환\n\n```json:metadata\n{\"files\": [\"src/lib/style-engine/crawler.ts\"], \"verifyCommand\": \"curl -X POST http://localhost:3000/api/templates/analyze -H 'Content-Type: application/json' -d '{\\\"url\\\":\\\"https://example.com\\\",\\\"name\\\":\\\"test\\\"}'\", \"acceptanceCriteria\": [\"crawlUrl returns html+css+screenshotUrl\", \"CrawlError thrown for invalid URL\", \"screenshot saved to supabase storage\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 3: Style Engine — Analyzer",
+      "status": "pending",
+      "blockedBy": [2],
+      "description": "**Goal:** HTML/CSS를 Claude로 분석해서 StyleProfile JSON 추출\n\n**Files:**\n- Create: `src/lib/style-engine/analyzer.ts`\n- Create: `src/lib/style-engine/analyzer.test.ts`\n\n**Verify:** `npx vitest run src/lib/style-engine/analyzer.test.ts` → PASS\n\n```json:metadata\n{\"files\": [\"src/lib/style-engine/analyzer.ts\", \"src/lib/style-engine/analyzer.test.ts\"], \"verifyCommand\": \"npx vitest run src/lib/style-engine/analyzer.test.ts\", \"acceptanceCriteria\": [\"returns StyleProfile\", \"colors.primary is hex\", \"cssSnippets has header/hero/card/footer\", \"AnalysisError on invalid JSON\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 4: Style Engine — Vector Store",
+      "status": "pending",
+      "blockedBy": [3],
+      "description": "**Goal:** StyleProfile를 임베딩해서 Supabase pgvector에 저장 및 유사 검색\n\n**Files:**\n- Create: `src/lib/style-engine/vector-store.ts`\n- Create: `src/lib/style-engine/vector-store.test.ts`\n- Create: `supabase/migrations/002_match_templates.sql`\n\n**Verify:** `npx vitest run src/lib/style-engine/vector-store.test.ts` → PASS\n\n```json:metadata\n{\"files\": [\"src/lib/style-engine/vector-store.ts\", \"supabase/migrations/002_match_templates.sql\"], \"verifyCommand\": \"npx vitest run src/lib/style-engine/vector-store.test.ts\", \"acceptanceCriteria\": [\"saveTemplate inserts with embedding\", \"searchSimilarTemplates returns TOP 3\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 5: Style Engine — API 라우트",
+      "status": "pending",
+      "blockedBy": [4],
+      "description": "**Goal:** URL/HTML POST → 크롤→분석→저장 전체 파이프라인 API\n\n**Files:**\n- Create: `src/app/api/templates/analyze/route.ts`\n- Create: `src/app/api/templates/route.ts`\n\n**Verify:** POST /api/templates/analyze → { templateId, thumbnailUrl }\n\n```json:metadata\n{\"files\": [\"src/app/api/templates/analyze/route.ts\", \"src/app/api/templates/route.ts\"], \"verifyCommand\": \"curl -X POST http://localhost:3000/api/templates/analyze -H 'Content-Type: application/json' -d '{\\\"url\\\":\\\"https://example.com\\\",\\\"name\\\":\\\"test\\\"}'\", \"acceptanceCriteria\": [\"POST with url returns templateId\", \"POST with html returns templateId\", \"GET returns template list\", \"missing fields return 400\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 6: Generation Engine — HTML Generator",
+      "status": "pending",
+      "blockedBy": [5],
+      "description": "**Goal:** 프롬프트 + 템플릿으로 완성된 HTML 파일 생성\n\n**Files:**\n- Create: `src/lib/generation-engine/html-generator.ts`\n- Create: `src/lib/generation-engine/html-generator.test.ts`\n- Create: `src/app/api/generate/html/route.ts`\n\n**Verify:** `npx vitest run src/lib/generation-engine/html-generator.test.ts` → PASS\n\n```json:metadata\n{\"files\": [\"src/lib/generation-engine/html-generator.ts\", \"src/app/api/generate/html/route.ts\"], \"verifyCommand\": \"npx vitest run src/lib/generation-engine/html-generator.test.ts\", \"acceptanceCriteria\": [\"HTML starts with DOCTYPE\", \"nav includes all menu items\", \"retry feedback improves result\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 7: Generation Engine — Screenshot",
+      "status": "pending",
+      "blockedBy": [6],
+      "description": "**Goal:** HTML → Browserless → PNG URL (Supabase Storage)\n\n**Files:**\n- Create: `src/lib/generation-engine/screenshot.ts`\n- Create: `src/app/api/generate/screenshot/route.ts`\n\n**Verify:** POST /api/generate/screenshot → { screenshotUrl: '...png' }\n\n```json:metadata\n{\"files\": [\"src/lib/generation-engine/screenshot.ts\", \"src/app/api/generate/screenshot/route.ts\"], \"verifyCommand\": \"curl -X POST http://localhost:3000/api/generate/screenshot -H 'Content-Type: application/json' -d '{\\\"pageId\\\":\\\"test\\\"}'\", \"acceptanceCriteria\": [\"returns PNG url\", \"ScreenshotError on browserless failure\", \"url ends with .png\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 8: 관리자 UI — 템플릿 관리",
+      "status": "pending",
+      "blockedBy": [5],
+      "description": "**Goal:** URL 업로드→분석→목록 관리하는 관리자 UI\n\n**Files:**\n- Create: `src/components/admin/TemplateUploader.tsx`\n- Create: `src/components/admin/TemplateCard.tsx`\n- Create: `src/app/(admin)/admin/templates/page.tsx`\n- Create: `src/app/(admin)/admin/templates/new/page.tsx`\n\n**Verify:** http://localhost:3000/admin/templates/new → 전체 플로우 동작\n\n```json:metadata\n{\"files\": [\"src/components/admin/TemplateUploader.tsx\", \"src/components/admin/TemplateCard.tsx\", \"src/app/(admin)/admin/templates/page.tsx\", \"src/app/(admin)/admin/templates/new/page.tsx\"], \"verifyCommand\": \"npx next dev\", \"acceptanceCriteria\": [\"loading state on analyze\", \"new card after analysis\", \"thumbnail and keywords visible\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 9: 사용자 Wizard UI",
+      "status": "pending",
+      "blockedBy": [7, 8],
+      "description": "**Goal:** 템플릿선택→메뉴설정→프롬프트→시안확인→다운로드 Wizard\n\n**Files:**\n- Create: `src/components/user/TemplateSelector.tsx`\n- Create: `src/components/user/MenuBuilder.tsx`\n- Create: `src/components/user/PromptInput.tsx`\n- Create: `src/components/user/PagePreview.tsx`\n- Create: `src/components/user/WizardLayout.tsx`\n- Create: `src/app/(user)/projects/new/page.tsx`\n- Create: `src/app/api/projects/route.ts`\n- Create: `src/app/api/projects/[id]/pages/route.ts`\n\n**Verify:** http://localhost:3000/projects/new → Wizard 전체 흐름 완주\n\n```json:metadata\n{\"files\": [\"src/components/user/\", \"src/app/(user)/projects/\", \"src/app/api/projects/\"], \"verifyCommand\": \"npx next dev\", \"acceptanceCriteria\": [\"step progression visible\", \"template grid loads\", \"menu add/remove works\", \"prompt hints clickable\", \"preview shows PNG\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 10: ZIP 다운로드 + 완료 화면",
+      "status": "pending",
+      "blockedBy": [9],
+      "description": "**Goal:** approved 페이지 전체를 ZIP으로 다운로드\n\n**Files:**\n- Create: `src/app/api/projects/[id]/download/route.ts`\n\n**Verify:** GET /api/projects/[id]/download → application/zip 응답\n\n```json:metadata\n{\"files\": [\"src/app/api/projects/[id]/download/route.ts\"], \"verifyCommand\": \"curl -O http://localhost:3000/api/projects/TEST_ID/download\", \"acceptanceCriteria\": [\"Content-Type: application/zip\", \"filenames based on page names\", \"only approved pages included\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-22T09:30:00Z"
+}
