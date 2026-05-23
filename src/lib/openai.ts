@@ -18,5 +18,5 @@ export async function generateImage(prompt: string): Promise<string> {
     size: '1536x1024',
     quality: 'high',
   })
-  return response.data[0].url ?? ''
+  return response.data?.[0]?.url ?? ''
 }
