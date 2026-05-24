@@ -51,7 +51,8 @@ export async function analyzeStyle(html: string, css: string): Promise<StyleProf
   try {
     raw = await claudeGenerate(ANALYSIS_SYSTEM_PROMPT, userPrompt, 2048)
   } catch (err) {
-    throw new AnalysisError('Claude API call failed', err)
+    const detail = err instanceof Error ? err.message : String(err)
+    throw new AnalysisError(`Claude analysis failed: ${detail}`, err)
   }
 
   // JSON 블록이 ``` ``` 로 감싸진 경우 제거
